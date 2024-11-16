@@ -24,16 +24,16 @@ public struct AdaptedValues: Sendable {
     }
 }
 
-private struct AdaptedValueStorage: Sendable, ~Copyable {
+struct AdaptedValueStorage: Sendable, ~Copyable {
     private let lock = Mutex<[String : Any]>([:])
     
-    fileprivate subscript<K: AdaptionKey, V: Sendable>(_ key: K.Type) -> V? {
+    subscript<K: AdaptionKey, V: Sendable>(_ key: K.Type) -> V? {
         get { lock.withLock { $0[key.storageKey] as? V } }
         set { lock.withLock { $0[key.storageKey] = newValue } }
     }
 }
 
-private nonisolated(unsafe) var storage = AdaptedValueStorage()
+nonisolated(unsafe) var storage = AdaptedValueStorage()
 
 extension AdaptionKey {
     fileprivate static var storageKey: String { "\(Self.self)" }
