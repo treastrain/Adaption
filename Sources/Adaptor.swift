@@ -15,7 +15,6 @@ public struct Adaptor<T: Sendable> {
     
     public var wrappedValue: T {
         get { AdaptedValues[keyPath] }
-        set { AdaptedValues[keyPath] = newValue }
     }
     
     private let keyPath: WritableKeyPath<AdaptedValues, T>
