@@ -1,0 +1,15 @@
+{
+  "originHash" : "1421f436c8b6600daf1e43a7e82b26754ee55bfd30ba5f0ace7e878b9b595451",
+  "pins" : [
+    {
+      "identity" : "prebuilt-swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/treastrain/prebuilt-swift-syntax",
+      "state" : {
+        "revision" : "ab5096c841c7c984239873d1ab3a10147583343c",
+        "version" : "600.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}
