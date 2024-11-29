@@ -58,15 +58,7 @@ struct Robot: Named {
 import Adaption
 
 extension AdaptedValues {
-    var named: any Named {
-        get { Self[NamedKey.self] }
-        set { Self[NamedKey.self] = newValue }
-    }
-    
-    private struct NamedKey: AdaptionKey {
-        typealias Value = any Named
-        static var defaultValue: Value { Person() }
-    }
+    @Item var named: any Named = Person()
 }
 ```
 

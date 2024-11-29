@@ -1,6 +1,7 @@
 // swift-tools-version: 6.0
 
 import PackageDescription
+import CompilerPluginSupport
 
 let package = Package(
     name: "Adaption",
@@ -10,9 +11,19 @@ let package = Package(
             name: "Adaption",
             targets: ["Adaption"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/treastrain/prebuilt-swift-syntax", exact: "600.0.1"),
+    ],
     targets: [
         .target(
-            name: "Adaption"),
+            name: "Adaption",
+            dependencies: ["AdaptionMacros"]),
+        .macro(
+            name: "AdaptionMacros",
+            dependencies: [
+                .product(name: "PrebuiltSwiftSyntax", package: "prebuilt-swift-syntax"),
+            ]
+        ),
         .testTarget(
             name: "AdaptionTests",
             dependencies: ["Adaption"]),
