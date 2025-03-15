@@ -6,7 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/treastrain/prebuilt-swift-syntax",
       "state" : {
-        "revision" : "ab5096c841c7c984239873d1ab3a10147583343c",
+        "revision" : "d130a8ac2a80d89726c89418b46cb99a146999c9",
         "version" : "600.0.1"
       }
     }
