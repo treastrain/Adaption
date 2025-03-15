@@ -12,7 +12,7 @@ let package = Package(
             targets: ["Adaption"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/treastrain/prebuilt-swift-syntax", exact: "600.0.1-arm64only"),
+        .package(url: "https://github.com/treastrain/prebuilt-swift-syntax", exact: "600.0.1"),
     ],
     targets: [
         .target(
