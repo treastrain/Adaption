@@ -12,6 +12,7 @@ import SwiftSyntaxMacros
 @main
 struct AdaptionPlugin: CompilerPlugin {
     let providingMacros: [any Macro.Type] = [
-        ItemMacro.self
+        ItemMacro.self,
+        MainActorItemMacro.self,
     ]
 }
