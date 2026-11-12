@@ -9,14 +9,8 @@ import Foundation
 
 final class TestItem: TestItemProtocol {
     let value: Int
-    let deinitBlock: @Sendable () -> Void
-    
-    init(value: Int, deinitBlock: @escaping @Sendable () -> Void) {
+
+    init(value: Int) {
         self.value = value
-        self.deinitBlock = deinitBlock
-    }
-    
-    deinit {
-        deinitBlock()
     }
 }

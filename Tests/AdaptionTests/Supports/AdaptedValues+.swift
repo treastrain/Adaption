@@ -8,18 +8,20 @@
 import Adaption
 import Foundation
 
-let defaultTestItemID = 123456789
+let defaultTestItemID = 123_456_789
 
 extension AdaptedValues {
     var testItem: any TestItemProtocol {
         get { Self[TestItemKey.self] }
         set { Self[TestItemKey.self] = newValue }
     }
-    
+
     struct TestItemKey: AdaptionKey {
         typealias Value = any TestItemProtocol
         static var defaultValue: Value {
-            TestItem(value: defaultTestItemID, deinitBlock: {})
+            TestItem(value: defaultTestItemID)
         }
     }
+
+    @Item var macroTestItem: any TestItemProtocol = TestItem(value: defaultTestItemID)
 }

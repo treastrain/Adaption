@@ -15,23 +15,39 @@ struct AdaptedValueStorageTests {
     @Test
     func getStorageValue() {
         let storage = AdaptedValueStorage()
-        let nilItem: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
-        #expect(nilItem == nil)
+        let item: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
+        #expect(item == nil)
     }
-    
+
     @Test
-    func setStorageValue() async throws {
-        var storage: _! = AdaptedValueStorage()
-        
-        try await confirmation { deinitedItem in
-            let testItemID = 123
-            storage[AdaptedValues.TestItemKey.self] = TestItem(value: testItemID, deinitBlock: { deinitedItem() })
-            
-            let newItemOrNil: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
-            let newItem = try #require(newItemOrNil)
-            #expect(newItem.value == testItemID)
-            
-            storage = nil
+    func setStorageValue() throws {
+        weak var releasedItem: TestItem?
+        do {
+            var storage = AdaptedValueStorage()
+            storage[AdaptedValues.TestItemKey.self] = TestItem(value: 123)
+
+            let storedItem: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
+            let item = try #require(storedItem as? TestItem)
+            releasedItem = item
+            #expect(item.value == 123)
+            storage[AdaptedValues.TestItemKey.self] = TestItem(value: 987)
+            let updatedItem: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
+            #expect(updatedItem?.value == 987)
         }
+        #expect(releasedItem == nil)
+    }
+
+    @Test
+    func removeStorageValue() {
+        var storage = AdaptedValueStorage()
+        storage[AdaptedValues.TestItemKey.self] = TestItem(value: 123)
+        weak let releasedItem: TestItem? = storage[AdaptedValues.TestItemKey.self]
+        #expect(releasedItem != nil)
+
+        storage[AdaptedValues.TestItemKey.self] = Optional<TestItem>.none
+
+        let item: TestItem? = storage[AdaptedValues.TestItemKey.self]
+        #expect(item == nil)
+        #expect(releasedItem == nil)
     }
 }

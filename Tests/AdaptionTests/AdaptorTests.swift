@@ -10,16 +10,43 @@ import Testing
 
 @testable import Adaption
 
+@MainActor
 @Suite(.tags(.adaptor))
 struct AdaptorTests {
     @Test
-    func getAdaptorValue() throws {
-        let testItemID = defaultTestItemID
-        let otherTestItemID = 987
-        
+    func getAdaptorValue() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
         @Adaptor(\.testItem) var item
-        let unwrappedItem = try #require(item as? TestItem)
-        #expect(unwrappedItem == TestItem(value: testItemID, deinitBlock: {}))
-        #expect(unwrappedItem != TestItem(value: otherTestItemID, deinitBlock: {}))
+        #expect(item.value == defaultTestItemID)
+        #expect(item === AdaptedValues[\.testItem])
+    }
+
+    @Test
+    func getUpdatedAdaptorValue() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
+        @Adaptor(\.testItem) var item
+        #expect(item.value == defaultTestItemID)
+
+        let replacement = TestItem(value: 987)
+        AdaptedValues[\.testItem] = replacement
+        #expect(item === replacement)
+        #expect(item.value == 987)
+    }
+
+    @Test
+    func getMacroAdaptorValue() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
+        @Adaptor(\.macroTestItem) var item
+        #expect(item.value == defaultTestItemID)
+
+        let replacement = TestItem(value: 987)
+        AdaptedValues[\.macroTestItem] = replacement
+        #expect(item === replacement)
     }
 }
