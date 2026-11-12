@@ -11,16 +11,45 @@ import SwiftSyntaxMacrosGenericTestSupport
 import Testing
 
 struct ItemMacroTests {
-    @Test(arguments: [false, true])
-    func expansion(mainActor: Bool) {
-        let macroName = mainActor ? "MainActorItem" : "Item"
-        let valuesName = mainActor ? "MainActorAdaptedValues" : "AdaptedValues"
+    @Test(arguments: ["extension OtherValues", "extension Alias", "struct MainActorAdaptedValues"])
+    func unsupportedContext(scope: String) {
+        assertMacroExpansion(
+            """
+            \(scope) {
+                @Item var item: Int = 0
+            }
+            """,
+            expandedSource: """
+                \(scope) {
+                    var item: Int = 0
+                }
+                """,
+            diagnostics: [
+                .init(
+                    message: "'@Item' macro can only attach to var declarations inside extensions of AdaptedValues or MainActorAdaptedValues",
+                    line: 2,
+                    column: 5
+                )
+            ],
+            macroSpecs: ["Item": .init(type: ItemMacro.self)],
+            failureHandler: { Issue.record(Comment(rawValue: $0.message)) }
+        )
+    }
+
+    @Test(arguments: [
+        "AdaptedValues",
+        "MainActorAdaptedValues",
+        "Adaption.AdaptedValues",
+        "Adaption.MainActorAdaptedValues",
+    ])
+    func expansion(valuesName: String) {
+        let mainActor = valuesName.hasSuffix("MainActorAdaptedValues")
         let keyName = mainActor ? "MainActorAdaptionKey" : "AdaptionKey"
 
         assertMacroExpansion(
             """
             extension \(valuesName) {
-                @\(macroName) var item: any ItemProtocol = Example()
+                @Item var item: any ItemProtocol = Example()
             }
             """,
             expandedSource: """
@@ -41,8 +70,7 @@ struct ItemMacroTests {
                 }
                 """,
             macroSpecs: [
-                "Item": .init(type: ItemMacro.self),
-                "MainActorItem": .init(type: MainActorItemMacro.self),
+                "Item": .init(type: ItemMacro.self)
             ],
             failureHandler: { Issue.record(Comment(rawValue: $0.message)) }
         )
@@ -50,14 +78,12 @@ struct ItemMacroTests {
 
     @Test(arguments: [false, true])
     func missingInitializer(mainActor: Bool) {
-        let macroName = mainActor ? "MainActorItem" : "Item"
         let valuesName = mainActor ? "MainActorAdaptedValues" : "AdaptedValues"
-        let diagnosticName = mainActor ? "MainActorItemMacro" : "Item"
 
         assertMacroExpansion(
             """
             extension \(valuesName) {
-                @\(macroName) var item: Int
+                @Item var item: Int
             }
             """,
             expandedSource: """
@@ -72,14 +98,13 @@ struct ItemMacroTests {
                 """,
             diagnostics: [
                 .init(
-                    message: "'@\(diagnosticName)' macro can only attach to var declarations inside extensions of \(valuesName)",
+                    message: "'@Item' macro can only attach to var declarations inside extensions of AdaptedValues or MainActorAdaptedValues",
                     line: 2,
                     column: 5
                 )
             ],
             macroSpecs: [
-                "Item": .init(type: ItemMacro.self),
-                "MainActorItem": .init(type: MainActorItemMacro.self),
+                "Item": .init(type: ItemMacro.self)
             ],
             failureHandler: { Issue.record(Comment(rawValue: $0.message)) }
         )

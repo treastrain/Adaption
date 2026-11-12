@@ -13,6 +13,5 @@ import SwiftSyntaxMacros
 struct AdaptionPlugin: CompilerPlugin {
     let providingMacros: [any Macro.Type] = [
         ItemMacro.self,
-        MainActorItemMacro.self,
     ]
 }

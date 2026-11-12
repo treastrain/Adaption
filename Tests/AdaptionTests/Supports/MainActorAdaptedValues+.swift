@@ -20,6 +20,5 @@ extension MainActorAdaptedValues {
         }
     }
 
-    @MainActorItem var macroTestItem: any MainActorTestItemProtocol =
-        MainActorTestItem(value: defaultTestItemID)
+    @Item var macroTestItem: any MainActorTestItemProtocol = MainActorTestItem(value: defaultTestItemID)
 }
