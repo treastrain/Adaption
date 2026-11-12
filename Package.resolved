@@ -1,13 +1,13 @@
 {
-  "originHash" : "1421f436c8b6600daf1e43a7e82b26754ee55bfd30ba5f0ace7e878b9b595451",
+  "originHash" : "68330b61c00912688fe3d833f7a11e222f511cd3b96cdf99c874901aaf85507a",
   "pins" : [
     {
-      "identity" : "prebuilt-swift-syntax",
+      "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/treastrain/prebuilt-swift-syntax",
+      "location" : "https://github.com/swiftlang/swift-syntax",
       "state" : {
-        "revision" : "d130a8ac2a80d89726c89418b46cb99a146999c9",
-        "version" : "600.0.1"
+        "revision" : "050f1a346fbbac0ca2cfb15a95274f7bd1cf0ccf",
+        "version" : "604.0.0"
       }
     }
   ],
