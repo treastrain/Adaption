@@ -22,11 +22,11 @@ enum ItemMacroExpansion {
 
         return [
             AccessorDeclSyntax(
-                stringLiteral: """
-                    get { Self[__Key_\(identifier).self] }
-                    set { Self[__Key_\(identifier).self] = newValue }
-                    """
-            )
+                stringLiteral: "get { Self[__Key_\(identifier).self] }"
+            ),
+            AccessorDeclSyntax(
+                stringLiteral: "set { Self[__Key_\(identifier).self] = newValue }"
+            ),
         ]
     }
 

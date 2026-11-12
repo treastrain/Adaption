@@ -58,7 +58,9 @@ struct ItemMacroTests {
                         get {
                             Self[__Key_item.self]
                         }
-                        set { Self[__Key_item.self] = newValue }
+                        set {
+                            Self[__Key_item.self] = newValue
+                        }
                     }
 
                     private struct __Key_item: \(keyName) {
@@ -92,7 +94,9 @@ struct ItemMacroTests {
                         get {
                             Self[__Key_item.self]
                         }
-                        set { Self[__Key_item.self] = newValue }
+                        set {
+                            Self[__Key_item.self] = newValue
+                        }
                     }
                 }
                 """,
