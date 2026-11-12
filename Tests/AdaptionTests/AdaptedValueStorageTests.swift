@@ -17,7 +17,7 @@ private actor StorageTestActor {
 
 @StorageTestActor
 private func checkPublicAccessFromGlobalActor() {
-    @Adaptor(\.testItem) var item
+    @Adaptor(shared: \.testItem) var item
     AdaptedValues[\.testItem] = item
     AdaptedValues[AdaptedValues.TestItemKey.self] = item
 }

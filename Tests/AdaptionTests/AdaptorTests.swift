@@ -13,12 +13,28 @@ import Testing
 @MainActor
 @Suite(.tags(.adaptor))
 struct AdaptorTests {
+    private struct Client {
+        @Adaptor(\.sharedService) var service
+    }
+
+    @Test
+    func infersSharedProviderFromShorthand() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
+        let client = Client()
+        #expect(client.service.value == defaultTestItemID)
+        let replacement = TestItem(value: 987)
+        AdaptedValues[\.sharedService] = replacement
+        #expect(client.service === replacement)
+    }
+
     @Test
     func getAdaptorValue() {
         Adaption.storage = AdaptedValueStorage()
         defer { Adaption.storage = AdaptedValueStorage() }
 
-        @Adaptor(\.testItem) var item
+        @Adaptor(shared: \.testItem) var item
         #expect(item.value == defaultTestItemID)
         #expect(item === AdaptedValues[\.testItem])
     }
@@ -28,7 +44,7 @@ struct AdaptorTests {
         Adaption.storage = AdaptedValueStorage()
         defer { Adaption.storage = AdaptedValueStorage() }
 
-        @Adaptor(\.testItem) var item
+        @Adaptor(shared: \.testItem) var item
         #expect(item.value == defaultTestItemID)
 
         let replacement = TestItem(value: 987)
@@ -42,11 +58,15 @@ struct AdaptorTests {
         Adaption.storage = AdaptedValueStorage()
         defer { Adaption.storage = AdaptedValueStorage() }
 
-        @Adaptor(\.macroTestItem) var item
+        @Adaptor(shared: \.macroTestItem) var item
         #expect(item.value == defaultTestItemID)
 
         let replacement = TestItem(value: 987)
         AdaptedValues[\.macroTestItem] = replacement
         #expect(item === replacement)
     }
+}
+
+extension AdaptedValues {
+    @Item fileprivate var sharedService: any TestItemProtocol = TestItem(value: defaultTestItemID)
 }
