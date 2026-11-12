@@ -7,13 +7,6 @@
 
 import Foundation
 
-protocol TestItemProtocol: Equatable, Sendable {
+protocol TestItemProtocol: AnyObject, Sendable {
     var value: Int { get }
-    var deinitBlock: @Sendable () -> Void { get }
-}
-
-extension TestItemProtocol {
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.value == rhs.value
-    }
 }

@@ -17,58 +17,60 @@ public struct ItemMacro: AccessorMacro, PeerMacro {
         providingAccessorsOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
     ) throws -> [AccessorDeclSyntax] {
-        guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier
-        else {
-            throw Error.onlyApplicableToAdaptedValuesExtension
-        }
-        
-        return [
-            AccessorDeclSyntax(
-                stringLiteral: """
-                    get { Self[__Key_\(identifier).self] }
-                    set { Self[__Key_\(identifier).self] = newValue }
-                    """
-            )
-        ]
+        guard (try? keyProtocolName(in: context)) != nil else { return [] }
+        return try ItemMacroExpansion.expansion(
+            providingAccessorsOf: declaration,
+            invalidDeclaration: Error.onlyApplicableToAdaptedValuesExtension
+        )
     }
-    
+
     public static func expansion(
         of node: AttributeSyntax,
         providingPeersOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier,
-              let valueType = binding.typeAnnotation?.type,
-              let initializerValue = binding.initializer?.value
-        else {
-            throw Error.onlyApplicableToAdaptedValuesExtension
-        }
-        
-        return [
-            DeclSyntax(
-                stringLiteral: """
-                    private struct __Key_\(identifier): AdaptionKey {
-                        typealias Value = \(valueType)
-                        static var defaultValue: Value { \(initializerValue) }
-                    }
-                    """
-            )
-        ]
+        try ItemMacroExpansion.expansion(
+            providingPeersOf: declaration,
+            keyProtocolName: try keyProtocolName(in: context),
+            invalidDeclaration: Error.onlyApplicableToAdaptedValuesExtension
+        )
     }
 }
 
 extension ItemMacro {
+    private static func keyProtocolName(in context: some MacroExpansionContext) throws -> String {
+        guard let scope = context.lexicalContext.first(where: { $0.isProtocol((any DeclGroupSyntax).self) }),
+            let extensionDecl = scope.as(ExtensionDeclSyntax.self)
+        else {
+            throw Error.onlyApplicableToAdaptedValuesExtension
+        }
+
+        let name: String
+        if let identifier = extensionDecl.extendedType.as(IdentifierTypeSyntax.self) {
+            name = identifier.name.text
+        } else if let member = extensionDecl.extendedType.as(MemberTypeSyntax.self),
+            let module = member.baseType.as(IdentifierTypeSyntax.self),
+            module.name.text == "Adaption"
+        {
+            name = member.name.text
+        } else {
+            throw Error.onlyApplicableToAdaptedValuesExtension
+        }
+
+        switch name {
+        case "AdaptedValues": return "AdaptionKey"
+        case "MainActorAdaptedValues": return "MainActorAdaptionKey"
+        default: throw Error.onlyApplicableToAdaptedValuesExtension
+        }
+    }
+
     enum Error: Swift.Error, CustomStringConvertible {
         case onlyApplicableToAdaptedValuesExtension
-        
+
         var description: String {
             switch self {
             case .onlyApplicableToAdaptedValuesExtension:
-                "'@Item' macro can only attach to var declarations inside extensions of AdaptedValues"
+                "'@Item' macro can only attach to var declarations inside extensions of AdaptedValues or MainActorAdaptedValues"
             }
         }
     }
