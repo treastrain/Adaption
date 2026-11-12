@@ -10,8 +10,30 @@ import Testing
 
 @testable import Adaption
 
+@globalActor
+private actor StorageTestActor {
+    static let shared = StorageTestActor()
+}
+
+@StorageTestActor
+private func checkPublicAccessFromGlobalActor() {
+    @Adaptor(\.testItem) var item
+    AdaptedValues[\.testItem] = item
+    AdaptedValues[AdaptedValues.TestItemKey.self] = item
+}
+
 @Suite(.tags(.storage))
 struct AdaptedValueStorageTests {
+    @StorageTestActor
+    @Test
+    func accessFromCustomGlobalActor() {
+        var storage = AdaptedValueStorage()
+        let item = TestItem(value: 987)
+        storage[AdaptedValues.TestItemKey.self] = item
+        let stored: TestItem? = storage[AdaptedValues.TestItemKey.self]
+        #expect(stored === item)
+    }
+
     @Test
     func storesOptionalNil() throws {
         var storage = AdaptedValueStorage()
