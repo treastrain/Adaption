@@ -24,11 +24,11 @@ public struct MainActorAdaptedValues {
 
 @MainActor
 struct MainActorAdaptedValueStorage: ~Copyable {
-    private var storage: [String: Any] = [:]
+    private var storage = AdaptedValueTable()
 
     subscript<K: MainActorAdaptionKey, V>(_ key: K.Type) -> V? {
-        get { storage[key.storageKey] as? V }
-        set { storage[key.storageKey] = newValue }
+        get { storage[key] }
+        set { storage[key] = newValue }
     }
 }
 
@@ -36,8 +36,6 @@ struct MainActorAdaptedValueStorage: ~Copyable {
 var mainActorStorage = MainActorAdaptedValueStorage()
 
 extension MainActorAdaptionKey {
-    fileprivate static var storageKey: String { "\(Self.self)" }
-
     fileprivate static var currentValue: Self.Value {
         get {
             if let existed: Self.Value = mainActorStorage[Self.self] {

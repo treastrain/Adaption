@@ -13,6 +13,17 @@ import Testing
 @Suite(.tags(.storage))
 struct AdaptedValueStorageTests {
     @Test
+    func storesOptionalNil() throws {
+        var storage = AdaptedValueStorage()
+        storage[AdaptedValues.TestItemKey.self] = Optional<TestItem?>.some(nil)
+
+        let stored: TestItem?? = storage[AdaptedValues.TestItemKey.self]
+        let value = try #require(stored)
+        #expect(value == nil)
+
+    }
+
+    @Test
     func getStorageValue() {
         let storage = AdaptedValueStorage()
         let item: (any TestItemProtocol)? = storage[AdaptedValues.TestItemKey.self]
