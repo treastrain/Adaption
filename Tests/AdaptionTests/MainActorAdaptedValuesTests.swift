@@ -13,6 +13,36 @@ import Testing
 @MainActor
 @Suite(.tags(.values))
 struct MainActorAdaptedValuesTests {
+    private struct CountingDefaultKey: MainActorAdaptionKey {
+        static var initializationCount = 0
+
+        static var defaultValue: MainActorTestItem {
+            initializationCount += 1
+            let dependency = MainActorAdaptedValues[MainActorAdaptedValues.TestItemKey.self]
+            return MainActorTestItem(value: dependency.value)
+        }
+    }
+
+    @Test
+    func defaultValueRunsOnMainActorOnlyWhenMissing() {
+        Adaption.mainActorStorage = MainActorAdaptedValueStorage()
+        CountingDefaultKey.initializationCount = 0
+        defer {
+            Adaption.mainActorStorage = MainActorAdaptedValueStorage()
+            CountingDefaultKey.initializationCount = 0
+        }
+
+        let first = MainActorAdaptedValues[CountingDefaultKey.self]
+        #expect(first.value == defaultTestItemID)
+        #expect(MainActorAdaptedValues[CountingDefaultKey.self] === first)
+        #expect(CountingDefaultKey.initializationCount == 1)
+
+        let replacement = MainActorTestItem(value: 987)
+        MainActorAdaptedValues[CountingDefaultKey.self] = replacement
+        #expect(MainActorAdaptedValues[CountingDefaultKey.self] === replacement)
+        #expect(CountingDefaultKey.initializationCount == 1)
+    }
+
     @Test
     func getValuesValue() {
         Adaption.mainActorStorage = MainActorAdaptedValueStorage()

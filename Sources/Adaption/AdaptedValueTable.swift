@@ -15,3 +15,16 @@ struct AdaptedValueTable {
         set { values[String(describing: key)] = newValue }
     }
 }
+
+func resolveAdaptedValue<Value>(
+    cached: Value?,
+    makeDefault: () -> Value,
+    store: (Value) -> Void
+) -> Value {
+    if let cached {
+        return cached
+    }
+    let value = makeDefault()
+    store(value)
+    return value
+}

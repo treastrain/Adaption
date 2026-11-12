@@ -38,13 +38,11 @@ nonisolated(unsafe) var storage = AdaptedValueStorage()
 extension AdaptionKey {
     fileprivate static var currentValue: Self.Value {
         get {
-            if let existed: Self.Value = storage[Self.self] {
-                return existed
-            } else {
-                let instance = defaultValue
-                storage[Self.self] = instance
-                return instance
-            }
+            resolveAdaptedValue(
+                cached: storage[Self.self],
+                makeDefault: { defaultValue },
+                store: { storage[Self.self] = $0 }
+            )
         }
         set { storage[Self.self] = newValue }
     }

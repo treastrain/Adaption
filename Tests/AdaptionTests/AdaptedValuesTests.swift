@@ -13,6 +13,24 @@ import Testing
 @MainActor
 @Suite(.tags(.values))
 struct AdaptedValuesTests {
+    private struct NestedDefaultKey: AdaptionKey {
+        static var defaultValue: Int { AdaptedValues[LeafDefaultKey.self] + 1 }
+    }
+
+    private struct LeafDefaultKey: AdaptionKey {
+        static var defaultValue: Int { 41 }
+    }
+
+    @Test
+    func defaultValueCanResolveAnotherKey() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
+        #expect(AdaptedValues[NestedDefaultKey.self] == 42)
+        AdaptedValues[LeafDefaultKey.self] = 99
+        #expect(AdaptedValues[NestedDefaultKey.self] == 42)
+    }
+
     @Test
     func getValuesValue() {
         Adaption.storage = AdaptedValueStorage()

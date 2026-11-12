@@ -38,13 +38,11 @@ var mainActorStorage = MainActorAdaptedValueStorage()
 extension MainActorAdaptionKey {
     fileprivate static var currentValue: Self.Value {
         get {
-            if let existed: Self.Value = mainActorStorage[Self.self] {
-                return existed
-            } else {
-                let instance = defaultValue
-                mainActorStorage[Self.self] = instance
-                return instance
-            }
+            resolveAdaptedValue(
+                cached: mainActorStorage[Self.self],
+                makeDefault: { defaultValue },
+                store: { mainActorStorage[Self.self] = $0 }
+            )
         }
         set { mainActorStorage[Self.self] = newValue }
     }
