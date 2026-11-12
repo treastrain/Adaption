@@ -32,6 +32,14 @@ let package = Package(
             name: "AdaptionTests",
             dependencies: ["Adaption"]
         ),
+        .testTarget(
+            name: "AdaptionMacrosTests",
+            dependencies: [
+                "AdaptionMacros",
+                .product(name: "SwiftSyntaxMacroExpansion", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacrosGenericTestSupport", package: "swift-syntax"),
+            ]
+        ),
     ]
 )
 
