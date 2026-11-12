@@ -12,10 +12,10 @@ public struct Adaptor<T: Sendable> {
     public init(_ keyPath: WritableKeyPath<AdaptedValues, T>) {
         self.keyPath = keyPath
     }
-    
+
     public var wrappedValue: T {
-        get { AdaptedValues[keyPath] }
+        AdaptedValues[keyPath]
     }
-    
+
     private let keyPath: WritableKeyPath<AdaptedValues, T>
 }

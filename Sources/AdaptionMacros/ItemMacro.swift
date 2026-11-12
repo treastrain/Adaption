@@ -18,12 +18,12 @@ public struct ItemMacro: AccessorMacro, PeerMacro {
         in context: some MacroExpansionContext
     ) throws -> [AccessorDeclSyntax] {
         guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier
+            let binding = varDecl.bindings.first,
+            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier
         else {
             throw Error.onlyApplicableToAdaptedValuesExtension
         }
-        
+
         return [
             AccessorDeclSyntax(
                 stringLiteral: """
@@ -33,21 +33,21 @@ public struct ItemMacro: AccessorMacro, PeerMacro {
             )
         ]
     }
-    
+
     public static func expansion(
         of node: AttributeSyntax,
         providingPeersOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier,
-              let valueType = binding.typeAnnotation?.type,
-              let initializerValue = binding.initializer?.value
+            let binding = varDecl.bindings.first,
+            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier,
+            let valueType = binding.typeAnnotation?.type,
+            let initializerValue = binding.initializer?.value
         else {
             throw Error.onlyApplicableToAdaptedValuesExtension
         }
-        
+
         return [
             DeclSyntax(
                 stringLiteral: """
@@ -64,7 +64,7 @@ public struct ItemMacro: AccessorMacro, PeerMacro {
 extension ItemMacro {
     enum Error: Swift.Error, CustomStringConvertible {
         case onlyApplicableToAdaptedValuesExtension
-        
+
         var description: String {
             switch self {
             case .onlyApplicableToAdaptedValuesExtension:
