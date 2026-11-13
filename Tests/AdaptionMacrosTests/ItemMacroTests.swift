@@ -78,6 +78,58 @@ struct ItemMacroTests {
         )
     }
 
+    @Test(arguments: [
+        "AdaptedValues",
+        "MainActorAdaptedValues",
+        "Adaption.AdaptedValues",
+        "Adaption.MainActorAdaptedValues",
+    ])
+    func inferredExpansion(valuesName: String) {
+        let mainActor = valuesName.hasSuffix("MainActorAdaptedValues")
+        let keyName = mainActor ? "MainActorAdaptionKey" : "AdaptionKey"
+        let isolation = mainActor ? "@MainActor " : ""
+
+        assertMacroExpansion(
+            """
+            extension \(valuesName) {
+                @Item var item = Example()
+            }
+            """,
+            expandedSource: """
+                extension \(valuesName) {
+                    var item {
+                        get {
+                            Self[__Key_item.self]
+                        }
+                        set {
+                            Self[__Key_item.self] = newValue
+                        }
+                    }
+
+                    private struct __Key_item: \(keyName) {
+                        typealias Value = ValueWitness.Value
+                        static var defaultValue: Value {
+                            ValueWitness().value
+                        }
+
+                        \(isolation)protocol ValueType {
+                            associatedtype Value
+                            var value: Value {
+                                get
+                            }
+                        }
+
+                        \(isolation)struct ValueWitness: ValueType {
+                            let value = Example()
+                        }
+                    }
+                }
+                """,
+            macroSpecs: ["Item": .init(type: ItemMacro.self)],
+            failureHandler: { Issue.record(Comment(rawValue: $0.message)) }
+        )
+    }
+
     @Test(arguments: [false, true])
     func missingInitializer(mainActor: Bool) {
         let valuesName = mainActor ? "MainActorAdaptedValues" : "AdaptedValues"

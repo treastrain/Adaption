@@ -78,6 +78,28 @@ struct AdaptedValuesTests {
     }
 
     @Test
+    func inferredMacroItemValue() {
+        Adaption.storage = AdaptedValueStorage()
+        defer { Adaption.storage = AdaptedValueStorage() }
+
+        let first: TestItem = AdaptedValues[\.inferredTestItem]
+        #expect(first.value == defaultTestItemID)
+        #expect(first === AdaptedValues[\.inferredTestItem])
+        let closureItem: TestItem = AdaptedValues[\.inferredClosureItem]
+        #expect(closureItem.value == defaultTestItemID)
+        #expect(closureItem !== first)
+
+        let replacement = TestItem(value: 987)
+        AdaptedValues[\.inferredTestItem] = replacement
+        #expect(AdaptedValues[\.inferredTestItem] === replacement)
+
+        Adaption.storage = AdaptedValueStorage()
+        #expect(AdaptedValues[\.inferredTestItem] !== first)
+        #expect(AdaptedValues[\.inferredTestItem].value == defaultTestItemID)
+        #expect(AdaptedValues[\.inferredClosureItem] !== closureItem)
+    }
+
+    @Test
     func macroItemValue() {
         Adaption.storage = AdaptedValueStorage()
         defer { Adaption.storage = AdaptedValueStorage() }

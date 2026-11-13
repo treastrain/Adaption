@@ -90,6 +90,28 @@ struct MainActorAdaptedValuesTests {
     }
 
     @Test
+    func inferredMacroItemValue() {
+        Adaption.mainActorStorage = MainActorAdaptedValueStorage()
+        defer { Adaption.mainActorStorage = MainActorAdaptedValueStorage() }
+
+        let first: MainActorTestItem = MainActorAdaptedValues[\.inferredTestItem]
+        #expect(first.value == defaultTestItemID)
+        #expect(first === MainActorAdaptedValues[\.inferredTestItem])
+        let closureItem: MainActorTestItem = MainActorAdaptedValues[\.inferredClosureItem]
+        #expect(closureItem.value == defaultTestItemID)
+        #expect(closureItem !== first)
+
+        let replacement = MainActorTestItem(value: 987)
+        MainActorAdaptedValues[\.inferredTestItem] = replacement
+        #expect(MainActorAdaptedValues[\.inferredTestItem] === replacement)
+
+        Adaption.mainActorStorage = MainActorAdaptedValueStorage()
+        #expect(MainActorAdaptedValues[\.inferredTestItem] !== first)
+        #expect(MainActorAdaptedValues[\.inferredTestItem].value == defaultTestItemID)
+        #expect(MainActorAdaptedValues[\.inferredClosureItem] !== closureItem)
+    }
+
+    @Test
     func macroItemValue() {
         Adaption.mainActorStorage = MainActorAdaptedValueStorage()
         defer { Adaption.mainActorStorage = MainActorAdaptedValueStorage() }
