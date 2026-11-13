@@ -24,4 +24,6 @@ extension AdaptedValues {
     }
 
     @Item var macroTestItem: any TestItemProtocol = TestItem(value: defaultTestItemID)
+    @Item var inferredTestItem = TestItem(value: defaultTestItemID)
+    @Item var inferredClosureItem = { TestItem(value: defaultTestItemID) }()
 }

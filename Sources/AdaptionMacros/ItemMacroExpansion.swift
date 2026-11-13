@@ -15,7 +15,7 @@ enum ItemMacroExpansion {
     ) throws -> [AccessorDeclSyntax] {
         guard let varDecl = declaration.as(VariableDeclSyntax.self),
             let binding = varDecl.bindings.first,
-            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier
+            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.trimmed
         else {
             throw invalidDeclaration
         }
@@ -37,11 +37,33 @@ enum ItemMacroExpansion {
     ) throws -> [DeclSyntax] {
         guard let varDecl = declaration.as(VariableDeclSyntax.self),
             let binding = varDecl.bindings.first,
-            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier,
-            let valueType = binding.typeAnnotation?.type,
+            let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.trimmed,
             let initializerValue = binding.initializer?.value
         else {
             throw invalidDeclaration
+        }
+
+        guard let valueType = binding.typeAnnotation?.type else {
+            let isolation = keyProtocolName == "MainActorAdaptionKey" ? "@MainActor " : ""
+            return [
+                DeclSyntax(
+                    stringLiteral: """
+                        private struct __Key_\(identifier): \(keyProtocolName) {
+                            typealias Value = ValueWitness.Value
+                            static var defaultValue: Value { ValueWitness().value }
+
+                            \(isolation)protocol ValueType {
+                                associatedtype Value
+                                var value: Value { get }
+                            }
+
+                            \(isolation)struct ValueWitness: ValueType {
+                                let value = \(initializerValue)
+                            }
+                        }
+                        """
+                )
+            ]
         }
 
         return [

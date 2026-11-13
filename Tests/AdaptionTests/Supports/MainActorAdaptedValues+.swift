@@ -21,4 +21,6 @@ extension MainActorAdaptedValues {
     }
 
     @Item var macroTestItem: any MainActorTestItemProtocol = MainActorTestItem(value: defaultTestItemID)
+    @Item var inferredTestItem = MainActorTestItem(value: defaultTestItemID)
+    @Item var inferredClosureItem = { MainActorTestItem(value: defaultTestItemID) }()
 }
